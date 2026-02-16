@@ -323,17 +323,21 @@ app.post('/api/execute', (req, res) => {
       }
     };
     
-    // Execute code
-    const func = new Function(...Object.keys(context), `return (async () => { ${code} })()`);
+    // Execute code in async context
+    const func = new Function(...Object.keys(context), code);
     const result = func(...Object.values(context));
     
     // Handle promises
     if (result instanceof Promise) {
       result
-        .then(output => res.json({ success: true, output: String(output || 'Code executed successfully') }))
+        .then(output => {
+          const outputStr = output !== undefined && output !== null ? String(output) : 'Code executed successfully';
+          res.json({ success: true, output: outputStr });
+        })
         .catch(error => res.json({ success: false, error: error.message }));
     } else {
-      res.json({ success: true, output: String(result || 'Code executed successfully') });
+      const outputStr = result !== undefined && result !== null ? String(result) : 'Code executed successfully';
+      res.json({ success: true, output: outputStr });
     }
   } catch (error) {
     res.json({ success: false, error: error.message });
@@ -371,7 +375,12 @@ async function start() {
   });
   
   // Start Discord bot
-  client.login(process.env.DISCORD_TOKEN);
+  try {
+    await client.login(process.env.DISCORD_TOKEN);
+  } catch (error) {
+    console.error('⚠️  Discord bot failed to connect:', error.message);
+    console.log('💡 Web server is still running on http://localhost:' + PORT);
+  }
 }
 
 start().catch(error => {
