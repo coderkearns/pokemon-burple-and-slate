@@ -1,3 +1,5 @@
+const fs = require('fs').promises;
+const path = require('path');
 const config = require('./config');
 const db = require('./db');
 
@@ -45,7 +47,10 @@ async function fetchPokemonFromApi() {
       promises.push(
         fetch(`https://pokeapi.co/api/v2/pokemon/${id}`)
           .then(r => r.ok ? r.json() : null)
-          .catch(() => null)
+          .catch(err => {
+            console.error(`  ⚠️ Failed to fetch Pokemon #${id}:`, err.message);
+            return null;
+          })
       );
     }
 
@@ -73,9 +78,6 @@ async function fetchPokemonFromApi() {
 
   // Store to db file
   const pokemonData = { pokemon: allPokemon };
-  // We need to directly write via db since getPokemonList returns from cached data
-  const fs = require('fs').promises;
-  const path = require('path');
   await fs.writeFile(
     path.join(config.dataDir, 'pokemon.json'),
     JSON.stringify(pokemonData, null, 2)

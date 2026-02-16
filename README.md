@@ -1,22 +1,47 @@
 # Pokemon Burple & Slate 🎮
 
-A Discord bot for Pokemon with an integrated admin panel! Catch Pokemon as they appear at random intervals, manage your collection, and control everything through a beautiful web interface.
+A Discord bot for Pokemon with an integrated admin panel! Catch real Pokemon (Gen 1–4) as they appear at random intervals, train them, browse the Pokedex, and manage everything through a web interface.
 
 ## Features
 
 ### Discord Bot
-- 🎯 **Pokemon Catching**: Pokemon spawn randomly in channels
+- 🎯 **Pokemon Catching**: Real Pokemon (Gen 1–4, from PokeAPI) spawn randomly in channels
 - 📊 **Collection Management**: Track all your caught Pokemon
+- 🏋️ **Training**: Train your Pokemon to gain XP and level up
+- 📖 **Pokedex**: Browse all available Pokemon with stats
+- 📈 **Trainer Stats**: View your trainer profile and progress
 - 🎲 **Random Spawns**: Pokemon appear at configurable random intervals
 - 🔘 **Button Interactions**: Easy one-click catching with Discord buttons
 - 🎨 **Rich Embeds**: Beautiful color-coded messages using the Burple theme
 
 ### Admin Panel
-- 💻 **Code Execution**: Run JavaScript code in the bot's global context
 - 📊 **Live Statistics**: Real-time bot stats and user information
 - 🛠️ **Utilities**: Spawn Pokemon, view users, manage data
 - 🎨 **Beautiful UI**: Sleek interface with Burple, Pink, and Green color scheme
 - 🔐 **Secure Authentication**: Password-protected admin access
+
+## Project Structure
+
+```
+├── index.js                 # Entry point
+├── src/
+│   ├── config.js            # Centralized configuration
+│   ├── db.js                # Data loading/saving with auto-creation
+│   ├── pokemon.js           # Pokemon logic & PokeAPI integration
+│   ├── bot.js               # Discord bot setup & event handlers
+│   ├── server.js            # Express web server
+│   └── commands/
+│       ├── index.js          # Command handler/registry
+│       ├── pokemon.js        # !pokemon / !collection
+│       ├── train.js          # !train
+│       ├── pokedex.js        # !pokedex / !dex
+│       ├── stats.js          # !stats / !profile
+│       ├── spawn.js          # !spawn (admin)
+│       └── help.js           # !help
+├── data/                    # Auto-created JSON data files
+├── public/                  # Admin panel frontend
+└── .env.example             # Environment variable template
+```
 
 ## Installation
 
@@ -43,14 +68,22 @@ DISCORD_CLIENT_ID=your_discord_client_id_here
 PORT=3000
 ADMIN_USERNAME=admin
 ADMIN_PASSWORD=changeme
+BOT_PREFIX=!
 POKEMON_SPAWN_MIN_INTERVAL=300000
 POKEMON_SPAWN_MAX_INTERVAL=900000
+POKEMON_SPAWN_TIMEOUT=300000
+DATA_DIR=./data
+MAX_POKEMON_ID=493
 ```
 
 5. Start the bot:
 ```bash
 npm start
 ```
+
+On first launch the bot will:
+- Create `data/users.json` and `data/pokemon.json` if they don't exist
+- Fetch Pokemon #1–493 from [PokeAPI](https://pokeapi.co/) and cache them locally
 
 ## Discord Bot Setup
 
@@ -69,9 +102,14 @@ npm start
 
 ### Discord Commands
 
-- `!pokemon` or `!collection` - View your Pokemon collection
-- `!help` - Show help message
-- `!spawn` - Spawn a Pokemon manually (Admin only)
+| Command | Aliases | Description |
+|---------|---------|-------------|
+| `!pokemon` | `!collection` | View your Pokemon collection |
+| `!train [name/index]` | | Train a Pokemon to gain XP and level up |
+| `!pokedex [name/id]` | `!dex` | Browse all available Pokemon |
+| `!stats` | `!profile` | View your trainer stats |
+| `!help` | | Show all available commands |
+| `!spawn` | | Spawn a Pokemon manually *(Admin only)* |
 
 ### Catching Pokemon
 
@@ -83,17 +121,30 @@ When a Pokemon appears in a channel, click the "🎯 Catch!" button to catch it.
 2. Login with your admin credentials from the `.env` file
 3. Use the admin panel to:
    - View live statistics
-   - Execute JavaScript code
    - Spawn Pokemon in specific channels
    - View user data
-   - Manage the bot
 
 ## Data Storage
 
-The bot uses JSON files for data storage:
+The bot uses JSON files for data storage (auto-created on first run):
 
-- `data/pokemon.json` - Pokemon data (name, type, rarity, sprite)
-- `data/users.json` - User data (caught Pokemon, statistics)
+- `data/pokemon.json` - Pokemon data fetched from PokeAPI (id, name, types, rarity, stats)
+- `data/users.json` - User data (caught Pokemon, training progress, statistics)
+
+## Configuration
+
+All settings are controlled via environment variables (see `.env.example`):
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `DISCORD_TOKEN` | | Discord bot token (required) |
+| `PORT` | `3000` | Web server port |
+| `BOT_PREFIX` | `!` | Command prefix |
+| `POKEMON_SPAWN_MIN_INTERVAL` | `300000` | Min spawn interval (ms) |
+| `POKEMON_SPAWN_MAX_INTERVAL` | `900000` | Max spawn interval (ms) |
+| `POKEMON_SPAWN_TIMEOUT` | `300000` | How long a spawn stays (ms) |
+| `MAX_POKEMON_ID` | `493` | Highest Pokemon ID to fetch (493 = Gen 4) |
+| `DATA_DIR` | `./data` | Directory for JSON data files |
 
 ## Color Scheme
 
@@ -112,32 +163,13 @@ To run in development mode:
 npm run dev
 ```
 
-## Security Note
+## Security Notes
 
-⚠️ **IMPORTANT**: The admin panel allows JavaScript code execution for administrative purposes. 
-
-**Security Recommendations:**
 - Use **strong, unique credentials** in your `.env` file
 - **Never expose** your admin credentials
-- Only allow **trusted administrators** to access the admin panel
 - Consider **IP whitelisting** in production environments
 - Enable **HTTPS** when deploying to production
-- Consider adding **rate limiting** to prevent brute force attacks (e.g., using `express-rate-limit`)
-- Add **audit logging** to track code execution
-- In production, consider implementing **session-based authentication** instead of query parameters
-- In production, consider **disabling code execution** or using a sandboxed environment
-
-The code execution feature is designed for trusted administrators to manage the bot efficiently. It should only be used in controlled environments.
-
-### Recommended Production Packages
-```bash
-npm install express-rate-limit helmet express-session
-```
-
-These packages provide:
-- `express-rate-limit`: Rate limiting to prevent abuse
-- `helmet`: Security headers
-- `express-session`: Session-based authentication
+- Consider adding **rate limiting** (e.g., `express-rate-limit`)
 
 ## License
 
