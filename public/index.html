@@ -369,33 +369,6 @@
         </div>
       </div>
 
-      <!-- Code Execution Panel -->
-      <div class="panel">
-        <h2>💻 Execute JavaScript Code</h2>
-        <div class="code-examples">
-          <h4>📝 Example Code Snippets (click to use):</h4>
-          <code onclick="useExample(this)">// Get all users\nreturn Object.keys(usersData.users).length;</code>
-          <code onclick="useExample(this)">// Get total Pokemon caught\nreturn Object.values(usersData.users).reduce((sum, user) => sum + user.catches, 0);</code>
-          <code onclick="useExample(this)">// Get all guilds\nreturn client.guilds.cache.map(g => ({ id: g.id, name: g.name, members: g.memberCount }));</code>
-          <code onclick="useExample(this)">// Get all channels\nreturn client.channels.cache.map(c => ({ id: c.id, name: c.name, type: c.type }));</code>
-          <code onclick="useExample(this)">// Save users data\nawait saveUsers();\nreturn 'Users data saved!';</code>
-        </div>
-        <div class="input-group">
-          <label for="code">JavaScript Code</label>
-          <textarea id="code" placeholder="Enter JavaScript code to execute...
-Available variables:
-- client (Discord client)
-- usersData (users database)
-- pokemonData (pokemon database)
-- currentSpawns (active spawns Map)
-- saveUsers() (function to save users)
-- spawnPokemon(channel) (function to spawn pokemon)
-- console.log() (returns formatted string)"></textarea>
-        </div>
-        <button onclick="executeCode()">▶️ Execute Code</button>
-        <div id="codeOutput" class="output hidden"></div>
-      </div>
-
       <!-- Utilities Panel -->
       <div class="panel">
         <h2>🛠️ Utilities</h2>
@@ -488,47 +461,6 @@ Available variables:
       }
     }
 
-    async function executeCode() {
-      if (!credentials) {
-        alert('Please authenticate first');
-        return;
-      }
-
-      const code = document.getElementById('code').value;
-      if (!code) {
-        alert('Please enter code to execute');
-        return;
-      }
-
-      const output = document.getElementById('codeOutput');
-      output.classList.remove('hidden', 'error', 'success');
-      output.textContent = 'Executing...';
-      output.classList.add('loading');
-
-      try {
-        const response = await fetch('/api/execute', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ ...credentials, code })
-        });
-
-        const result = await response.json();
-        output.classList.remove('loading');
-
-        if (result.success) {
-          output.classList.add('success');
-          output.textContent = result.output;
-        } else {
-          output.classList.add('error');
-          output.textContent = 'Error: ' + result.error;
-        }
-      } catch (error) {
-        output.classList.remove('loading');
-        output.classList.add('error');
-        output.textContent = 'Network error: ' + error.message;
-      }
-    }
-
     async function spawnPokemon() {
       if (!credentials) {
         alert('Please authenticate first');
@@ -582,7 +514,7 @@ Available variables:
       output.classList.add('loading');
 
       try {
-        const response = await fetch('/api/users');
+        const response = await fetch(`/api/users?username=${encodeURIComponent(credentials.username)}&password=${encodeURIComponent(credentials.password)}`);
         const data = await response.json();
         
         output.classList.remove('loading');
@@ -602,40 +534,22 @@ Available variables:
       }
 
       const output = document.getElementById('utilOutput');
-      output.classList.remove('hidden');
-      output.classList.remove('error', 'success');
+      output.classList.remove('hidden', 'error', 'success');
       output.classList.add('loading');
-      output.textContent = 'Executing code to fetch Pokemon...';
+      output.textContent = 'Loading Pokemon data...';
 
       try {
-        const response = await fetch('/api/execute', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            ...credentials, 
-            code: 'return JSON.stringify(pokemonData, null, 2);' 
-          })
-        });
+        const response = await fetch(`/api/stats?username=${encodeURIComponent(credentials.username)}&password=${encodeURIComponent(credentials.password)}`);
+        if (!response.ok) throw new Error('Failed to load');
 
-        const result = await response.json();
         output.classList.remove('loading');
-
-        if (result.success) {
-          output.classList.add('success');
-          output.textContent = result.output;
-        } else {
-          output.classList.add('error');
-          output.textContent = 'Error: ' + result.error;
-        }
+        output.classList.add('success');
+        output.textContent = 'Pokemon data is stored locally in data/pokemon.json. Use the Pokedex bot command to browse Pokemon.';
       } catch (error) {
         output.classList.remove('loading');
         output.classList.add('error');
         output.textContent = 'Error: ' + error.message;
       }
-    }
-
-    function useExample(element) {
-      document.getElementById('code').value = element.textContent;
     }
 
     // Auto-refresh stats every 10 seconds if authenticated
