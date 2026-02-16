@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokemon Bot - Admin Panel</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --black: #000000;
+      --dark: #1f1f1f;
+      --white: #ffffff;
+      
+      --burple: #5865f2;
+      --burple-light: #e0e3ff;
+      --burple-dark: #19175c;
+      
+      --green: #35ed7e;
+      --green-light: #c8ffef;
+      --green-dark: #002920;
+      
+      --pink: #ff4cd2;
+      --pink-light: #f5c9ff;
+      --pink-dark: #381f2c;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--dark) 0%, var(--burple-dark) 100%);
+      color: var(--white);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(88, 101, 242, 0.3);
+    }
+
+    h1 {
+      font-size: 3em;
+      background: linear-gradient(90deg, var(--burple), var(--pink));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      color: var(--burple-light);
+      font-size: 1.2em;
+    }
+
+    .auth-section {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      border: 2px solid var(--burple);
+    }
+
+    .auth-section.authenticated {
+      border-color: var(--green);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, var(--burple-dark), var(--dark));
+      padding: 25px;
+      border-radius: 15px;
+      border: 2px solid var(--burple);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(88, 101, 242, 0.3);
+    }
+
+    .stat-label {
+      color: var(--burple-light);
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 2.5em;
+      font-weight: bold;
+      background: linear-gradient(90deg, var(--green), var(--burple-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .panel {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      border: 2px solid var(--burple);
+    }
+
+    .panel h2 {
+      color: var(--burple-light);
+      margin-bottom: 20px;
+      font-size: 1.8em;
+    }
+
+    .input-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      color: var(--burple-light);
+      margin-bottom: 5px;
+      font-size: 0.9em;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px solid var(--burple);
+      border-radius: 8px;
+      color: var(--white);
+      font-size: 1em;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      transition: border-color 0.3s, background 0.3s;
+    }
+
+    input[type="text"]:focus,
+    input[type="password"]:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--pink);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    textarea {
+      min-height: 200px;
+      font-family: 'Courier New', monospace;
+      resize: vertical;
+    }
+
+    button {
+      padding: 12px 30px;
+      background: linear-gradient(135deg, var(--burple), var(--pink));
+      border: none;
+      border-radius: 8px;
+      color: var(--white);
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(88, 101, 242, 0.5);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .output {
+      background: var(--black);
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      border: 2px solid var(--green-dark);
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .output.error {
+      border-color: var(--pink);
+      color: var(--pink-light);
+    }
+
+    .output.success {
+      border-color: var(--green);
+      color: var(--green-light);
+    }
+
+    .utils-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .util-card {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid var(--burple-dark);
+      transition: border-color 0.3s;
+    }
+
+    .util-card:hover {
+      border-color: var(--burple);
+    }
+
+    .util-card h3 {
+      color: var(--pink);
+      margin-bottom: 15px;
+    }
+
+    .util-card p {
+      color: var(--burple-light);
+      font-size: 0.9em;
+      margin-bottom: 15px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .auth-status {
+      display: inline-block;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.9em;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .auth-status.connected {
+      background: var(--green-dark);
+      color: var(--green-light);
+    }
+
+    .auth-status.disconnected {
+      background: var(--pink-dark);
+      color: var(--pink-light);
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    .loading {
+      animation: pulse 1.5s infinite;
+    }
+
+    .code-examples {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid var(--burple-dark);
+    }
+
+    .code-examples h4 {
+      color: var(--green);
+      margin-bottom: 10px;
+      font-size: 0.9em;
+    }
+
+    .code-examples code {
+      display: block;
+      background: var(--black);
+      padding: 8px;
+      border-radius: 4px;
+      margin: 5px 0;
+      font-size: 0.85em;
+      color: var(--green-light);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .code-examples code:hover {
+      background: var(--burple-dark);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎮 Pokemon Bot Admin Panel</h1>
+      <p class="subtitle">Manage your Discord Pokemon Bot</p>
+    </header>
+
+    <!-- Authentication Section -->
+    <div class="auth-section" id="authSection">
+      <h2>🔐 Authentication <span class="auth-status disconnected" id="authStatus">Disconnected</span></h2>
+      <div class="input-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Enter admin username">
+      </div>
+      <div class="input-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Enter admin password">
+      </div>
+      <button onclick="authenticate()">Login</button>
+    </div>
+
+    <!-- Stats Section -->
+    <div id="mainContent" class="hidden">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total Users</div>
+          <div class="stat-value" id="totalUsers">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Total Catches</div>
+          <div class="stat-value" id="totalCatches">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active Spawns</div>
+          <div class="stat-value" id="activeSpawns">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Bot Status</div>
+          <div class="stat-value" id="botStatus">offline</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Guilds</div>
+          <div class="stat-value" id="guilds">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Channels</div>
+          <div class="stat-value" id="channels">0</div>
+        </div>
+      </div>
+
+      <!-- Code Execution Panel -->
+      <div class="panel">
+        <h2>💻 Execute JavaScript Code</h2>
+        <div class="code-examples">
+          <h4>📝 Example Code Snippets (click to use):</h4>
+          <code onclick="useExample(this)">// Get all users\nreturn Object.keys(usersData.users).length;</code>
+          <code onclick="useExample(this)">// Get total Pokemon caught\nreturn Object.values(usersData.users).reduce((sum, user) => sum + user.catches, 0);</code>
+          <code onclick="useExample(this)">// Get all guilds\nreturn client.guilds.cache.map(g => ({ id: g.id, name: g.name, members: g.memberCount }));</code>
+          <code onclick="useExample(this)">// Get all channels\nreturn client.channels.cache.map(c => ({ id: c.id, name: c.name, type: c.type }));</code>
+          <code onclick="useExample(this)">// Save users data\nawait saveUsers();\nreturn 'Users data saved!';</code>
+        </div>
+        <div class="input-group">
+          <label for="code">JavaScript Code</label>
+          <textarea id="code" placeholder="Enter JavaScript code to execute...
+Available variables:
+- client (Discord client)
+- usersData (users database)
+- pokemonData (pokemon database)
+- currentSpawns (active spawns Map)
+- saveUsers() (function to save users)
+- spawnPokemon(channel) (function to spawn pokemon)
+- console.log() (returns formatted string)"></textarea>
+        </div>
+        <button onclick="executeCode()">▶️ Execute Code</button>
+        <div id="codeOutput" class="output hidden"></div>
+      </div>
+
+      <!-- Utilities Panel -->
+      <div class="panel">
+        <h2>🛠️ Utilities</h2>
+        <div class="utils-grid">
+          <div class="util-card">
+            <h3>🎯 Spawn Pokemon</h3>
+            <p>Spawn a Pokemon in a specific channel</p>
+            <div class="input-group">
+              <label for="channelId">Channel ID</label>
+              <input type="text" id="channelId" placeholder="Enter channel ID">
+            </div>
+            <button onclick="spawnPokemon()">Spawn Pokemon</button>
+          </div>
+
+          <div class="util-card">
+            <h3>📊 View All Users</h3>
+            <p>View all registered users and their data</p>
+            <button onclick="viewUsers()">View Users</button>
+          </div>
+
+          <div class="util-card">
+            <h3>🔄 Refresh Stats</h3>
+            <p>Reload statistics from the server</p>
+            <button onclick="loadStats()">Refresh Stats</button>
+          </div>
+
+          <div class="util-card">
+            <h3>📝 View Pokemon Data</h3>
+            <p>View all available Pokemon</p>
+            <button onclick="viewPokemon()">View Pokemon</button>
+          </div>
+        </div>
+        <div id="utilOutput" class="output hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let credentials = null;
+
+    function authenticate() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      if (!username || !password) {
+        alert('Please enter both username and password');
+        return;
+      }
+
+      credentials = { username, password };
+      
+      // Test authentication by loading stats
+      loadStats()
+        .then(() => {
+          document.getElementById('authSection').classList.add('authenticated');
+          document.getElementById('authStatus').textContent = 'Connected';
+          document.getElementById('authStatus').classList.remove('disconnected');
+          document.getElementById('authStatus').classList.add('connected');
+          document.getElementById('mainContent').classList.remove('hidden');
+        })
+        .catch(() => {
+          alert('Authentication failed! Check your credentials.');
+          credentials = null;
+        });
+    }
+
+    async function loadStats() {
+      try {
+        const response = await fetch('/api/stats');
+        const data = await response.json();
+        
+        document.getElementById('totalUsers').textContent = data.totalUsers;
+        document.getElementById('totalCatches').textContent = data.totalCatches;
+        document.getElementById('activeSpawns').textContent = data.activeSpawns;
+        document.getElementById('botStatus').textContent = data.botStatus;
+        document.getElementById('guilds').textContent = data.guilds;
+        document.getElementById('channels').textContent = data.channels;
+      } catch (error) {
+        console.error('Error loading stats:', error);
+        throw error;
+      }
+    }
+
+    async function executeCode() {
+      if (!credentials) {
+        alert('Please authenticate first');
+        return;
+      }
+
+      const code = document.getElementById('code').value;
+      if (!code) {
+        alert('Please enter code to execute');
+        return;
+      }
+
+      const output = document.getElementById('codeOutput');
+      output.classList.remove('hidden', 'error', 'success');
+      output.textContent = 'Executing...';
+      output.classList.add('loading');
+
+      try {
+        const response = await fetch('/api/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...credentials, code })
+        });
+
+        const result = await response.json();
+        output.classList.remove('loading');
+
+        if (result.success) {
+          output.classList.add('success');
+          output.textContent = result.output;
+        } else {
+          output.classList.add('error');
+          output.textContent = 'Error: ' + result.error;
+        }
+      } catch (error) {
+        output.classList.remove('loading');
+        output.classList.add('error');
+        output.textContent = 'Network error: ' + error.message;
+      }
+    }
+
+    async function spawnPokemon() {
+      if (!credentials) {
+        alert('Please authenticate first');
+        return;
+      }
+
+      const channelId = document.getElementById('channelId').value;
+      if (!channelId) {
+        alert('Please enter a channel ID');
+        return;
+      }
+
+      const output = document.getElementById('utilOutput');
+      output.classList.remove('hidden', 'error', 'success');
+      output.textContent = 'Spawning Pokemon...';
+      output.classList.add('loading');
+
+      try {
+        const response = await fetch('/api/spawn', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...credentials, channelId })
+        });
+
+        const result = await response.json();
+        output.classList.remove('loading');
+
+        if (result.success || response.ok) {
+          output.classList.add('success');
+          output.textContent = 'Pokemon spawned successfully!';
+        } else {
+          output.classList.add('error');
+          output.textContent = 'Error: ' + (result.error || 'Unknown error');
+        }
+      } catch (error) {
+        output.classList.remove('loading');
+        output.classList.add('error');
+        output.textContent = 'Network error: ' + error.message;
+      }
+    }
+
+    async function viewUsers() {
+      if (!credentials) {
+        alert('Please authenticate first');
+        return;
+      }
+
+      const output = document.getElementById('utilOutput');
+      output.classList.remove('hidden', 'error', 'success');
+      output.textContent = 'Loading users...';
+      output.classList.add('loading');
+
+      try {
+        const response = await fetch('/api/users');
+        const data = await response.json();
+        
+        output.classList.remove('loading');
+        output.classList.add('success');
+        output.textContent = JSON.stringify(data, null, 2);
+      } catch (error) {
+        output.classList.remove('loading');
+        output.classList.add('error');
+        output.textContent = 'Error: ' + error.message;
+      }
+    }
+
+    async function viewPokemon() {
+      if (!credentials) {
+        alert('Please authenticate first');
+        return;
+      }
+
+      const output = document.getElementById('utilOutput');
+      output.classList.remove('hidden');
+      output.classList.remove('error', 'success');
+      output.classList.add('loading');
+      output.textContent = 'Executing code to fetch Pokemon...';
+
+      try {
+        const response = await fetch('/api/execute', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            ...credentials, 
+            code: 'return JSON.stringify(pokemonData, null, 2);' 
+          })
+        });
+
+        const result = await response.json();
+        output.classList.remove('loading');
+
+        if (result.success) {
+          output.classList.add('success');
+          output.textContent = result.output;
+        } else {
+          output.classList.add('error');
+          output.textContent = 'Error: ' + result.error;
+        }
+      } catch (error) {
+        output.classList.remove('loading');
+        output.classList.add('error');
+        output.textContent = 'Error: ' + error.message;
+      }
+    }
+
+    function useExample(element) {
+      document.getElementById('code').value = element.textContent;
+    }
+
+    // Auto-refresh stats every 10 seconds if authenticated
+    setInterval(() => {
+      if (credentials && !document.getElementById('mainContent').classList.contains('hidden')) {
+        loadStats().catch(() => {});
+      }
+    }, 10000);
+  </script>
+</body>
+</html>
