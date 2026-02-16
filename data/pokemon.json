@@ -1,0 +1,74 @@
+{
+  "pokemon": [
+    {
+      "id": 1,
+      "name": "Burplezard",
+      "type": "Fire/Burple",
+      "rarity": "rare",
+      "sprite": "🔥"
+    },
+    {
+      "id": 2,
+      "name": "Slatewing",
+      "type": "Flying/Rock",
+      "rarity": "uncommon",
+      "sprite": "🦅"
+    },
+    {
+      "id": 3,
+      "name": "Pinkplume",
+      "type": "Fairy",
+      "rarity": "common",
+      "sprite": "🌸"
+    },
+    {
+      "id": 4,
+      "name": "Greenvine",
+      "type": "Grass",
+      "rarity": "common",
+      "sprite": "🌿"
+    },
+    {
+      "id": 5,
+      "name": "Burplefin",
+      "type": "Water/Burple",
+      "rarity": "rare",
+      "sprite": "🐟"
+    },
+    {
+      "id": 6,
+      "name": "Slaterock",
+      "type": "Rock/Ground",
+      "rarity": "uncommon",
+      "sprite": "🪨"
+    },
+    {
+      "id": 7,
+      "name": "Pinkflutter",
+      "type": "Bug/Fairy",
+      "rarity": "common",
+      "sprite": "🦋"
+    },
+    {
+      "id": 8,
+      "name": "Greenleaf",
+      "type": "Grass",
+      "rarity": "common",
+      "sprite": "🍃"
+    },
+    {
+      "id": 9,
+      "name": "Burplebeast",
+      "type": "Dragon/Burple",
+      "rarity": "legendary",
+      "sprite": "🐉"
+    },
+    {
+      "id": 10,
+      "name": "Steelwing",
+      "type": "Steel/Flying",
+      "rarity": "rare",
+      "sprite": "⚔️"
+    }
+  ]
+}
