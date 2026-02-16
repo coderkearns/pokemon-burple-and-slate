@@ -463,8 +463,17 @@ Available variables:
     }
 
     async function loadStats() {
+      if (!credentials) {
+        throw new Error('Not authenticated');
+      }
+      
       try {
-        const response = await fetch('/api/stats');
+        const response = await fetch(`/api/stats?username=${encodeURIComponent(credentials.username)}&password=${encodeURIComponent(credentials.password)}`);
+        
+        if (!response.ok) {
+          throw new Error('Failed to load stats');
+        }
+        
         const data = await response.json();
         
         document.getElementById('totalUsers').textContent = data.totalUsers;

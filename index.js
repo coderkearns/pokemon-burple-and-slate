@@ -136,7 +136,7 @@ function scheduleSpawns() {
       // Get all text channels the bot can see
       const channels = client.channels.cache.filter(
         channel => channel.isTextBased() && channel.guild && 
-        channel.permissionsFor(client.user).has('SendMessages')
+        channel.permissionsFor(client.user)?.has('SendMessages')
       );
       
       if (channels.size > 0) {
@@ -162,7 +162,7 @@ client.once('ready', async () => {
   setTimeout(async () => {
     const channels = client.channels.cache.filter(
       channel => channel.isTextBased() && channel.guild && 
-      channel.permissionsFor(client.user).has('SendMessages')
+      channel.permissionsFor(client.user)?.has('SendMessages')
     );
     
     if (channels.size > 0) {
@@ -276,8 +276,28 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// API: Get bot stats
+// API: Get bot stats (requires authentication)
 app.get('/api/stats', (req, res) => {
+  // Check for basic auth or query params
+  const authHeader = req.headers.authorization;
+  const { username, password } = req.query;
+  
+  // Allow either basic auth or query params for easier access
+  let authenticated = false;
+  
+  if (username && password) {
+    authenticated = username === process.env.ADMIN_USERNAME && password === process.env.ADMIN_PASSWORD;
+  } else if (authHeader) {
+    const base64Credentials = authHeader.split(' ')[1] || '';
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+    const [user, pass] = credentials.split(':');
+    authenticated = user === process.env.ADMIN_USERNAME && pass === process.env.ADMIN_PASSWORD;
+  }
+  
+  if (!authenticated) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
   const totalUsers = Object.keys(usersData.users).length;
   const totalCatches = Object.values(usersData.users).reduce((sum, user) => sum + user.catches, 0);
   const activeSpawns = currentSpawns.size;
@@ -298,6 +318,10 @@ app.get('/api/users', (req, res) => {
 });
 
 // API: Execute code (admin only)
+// ⚠️ SECURITY WARNING: This endpoint allows arbitrary code execution
+// It is intended for administrative purposes only and should be protected
+// by strong authentication. In production, consider additional security measures
+// such as IP whitelisting, rate limiting, or audit logging.
 app.post('/api/execute', (req, res) => {
   const { username, password, code } = req.body;
   

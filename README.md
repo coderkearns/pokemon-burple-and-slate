@@ -114,11 +114,19 @@ npm run dev
 
 ## Security Note
 
-⚠️ The admin panel allows code execution. Make sure to:
-- Use strong credentials in your `.env` file
-- Never expose your admin credentials
-- Only allow trusted users to access the admin panel
-- Consider adding additional security measures in production
+⚠️ **IMPORTANT**: The admin panel allows JavaScript code execution for administrative purposes. 
+
+**Security Recommendations:**
+- Use **strong, unique credentials** in your `.env` file
+- **Never expose** your admin credentials
+- Only allow **trusted administrators** to access the admin panel
+- Consider **IP whitelisting** in production environments
+- Enable **HTTPS** when deploying to production
+- Consider adding **rate limiting** to prevent brute force attacks
+- Add **audit logging** to track code execution
+- In production, consider **disabling code execution** or using a sandboxed environment
+
+The code execution feature is designed for trusted administrators to manage the bot efficiently. It should only be used in controlled environments.
 
 ## License
 
