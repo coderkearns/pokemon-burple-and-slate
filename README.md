@@ -122,11 +122,22 @@ npm run dev
 - Only allow **trusted administrators** to access the admin panel
 - Consider **IP whitelisting** in production environments
 - Enable **HTTPS** when deploying to production
-- Consider adding **rate limiting** to prevent brute force attacks
+- Consider adding **rate limiting** to prevent brute force attacks (e.g., using `express-rate-limit`)
 - Add **audit logging** to track code execution
+- In production, consider implementing **session-based authentication** instead of query parameters
 - In production, consider **disabling code execution** or using a sandboxed environment
 
 The code execution feature is designed for trusted administrators to manage the bot efficiently. It should only be used in controlled environments.
+
+### Recommended Production Packages
+```bash
+npm install express-rate-limit helmet express-session
+```
+
+These packages provide:
+- `express-rate-limit`: Rate limiting to prevent abuse
+- `helmet`: Security headers
+- `express-session`: Session-based authentication
 
 ## License
 

@@ -272,11 +272,16 @@ client.on('messageCreate', async message => {
 });
 
 // Express routes
+
+// Serve index.html
+// Note: Consider adding rate limiting in production to prevent abuse
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // API: Get bot stats (requires authentication)
+// Note: Uses query parameters for authentication for ease of use.
+// In production, consider using session-based auth or HTTP-only cookies.
 app.get('/api/stats', (req, res) => {
   // Check for basic auth or query params
   const authHeader = req.headers.authorization;
